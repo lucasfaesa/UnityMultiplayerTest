@@ -14,8 +14,12 @@ public class PlayerControl : NetworkBehaviour
     [SerializeField] private Vector2 defaultPositionRange = new Vector2(-4, 4);
     [SerializeField] private NetworkVariable<float> forwardBackPosition = new NetworkVariable<float>();
     [SerializeField] private NetworkVariable<float> leftRightPosition = new NetworkVariable<float>();
-    
-     //client caching
+    [SerializeField] private Animator animator;
+
+    private static readonly int Speed = Animator.StringToHash("Speed");
+
+    private bool pressingKey;
+    //client caching
     //private float oldForwardBackPosition;
     //private float oldLeftRightPosition;
 
@@ -42,20 +46,37 @@ public class PlayerControl : NetworkBehaviour
         if (Keyboard.current.wKey.isPressed)
         {
             transform.Translate(Vector3.forward * Time.deltaTime * playerSpeed);
+            //animator.SetFloat(Speed, 5);
+            SetAnimatorSpeedValueServerRpc(5);
+            Debug.LogError(animator.GetFloat(Speed));
         }
+
+
         if (Keyboard.current.dKey.isPressed)
         {
             transform.Translate(Vector3.right * Time.deltaTime * playerSpeed);
+            SetAnimatorSpeedValueServerRpc(5);
         }
+
         if (Keyboard.current.sKey.isPressed)
         {
             transform.Translate(Vector3.back * Time.deltaTime * playerSpeed);
+            SetAnimatorSpeedValueServerRpc(5);
         }
+
         if (Keyboard.current.aKey.isPressed)
         {
             transform.Translate(Vector3.left * Time.deltaTime * playerSpeed);
+            SetAnimatorSpeedValueServerRpc(5);
         }
 
+        if (!Keyboard.current.aKey.isPressed && !Keyboard.current.wKey.isPressed && !Keyboard.current.dKey.isPressed &&
+            !Keyboard.current.sKey.isPressed)
+        {
+            SetAnimatorSpeedValueServerRpc(0);
+        }
+        
+        /*
         if (IsOwner)
         {
             if (Keyboard.current.rKey.wasReleasedThisFrame)
@@ -63,7 +84,19 @@ public class PlayerControl : NetworkBehaviour
                 FindObjectOfType<UIManager>().CountPlayers();
             }    
         }
-        
+        */
+    }
+
+    [ServerRpc]
+    private void SetAnimatorSpeedValueServerRpc(float value)
+    {
+        SetAnimatorSpeedValueClientRpc(value);
+    }
+
+    [ClientRpc]
+    private void SetAnimatorSpeedValueClientRpc(float value)
+    {
+        animator.SetFloat(Speed, value);
     }
 
 }

@@ -1327,6 +1327,7 @@ MonoBehaviour:
     m_InternalValue: 0
   leftRightPosition:
     m_InternalValue: 0
+  animator: {fileID: 6982812146204527121}
 --- !u!114 &4297772566284319752
 MonoBehaviour:
   m_ObjectHideFlags: 0
