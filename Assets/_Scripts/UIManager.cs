@@ -13,10 +13,14 @@ public class UIManager : NetworkBehaviour
     [SerializeField] private Button startServerButton;
     [SerializeField] private Button startHostButton;
     [SerializeField] private Button startClientButton;
-
+    [SerializeField] private Button startPhysicsButton;
+    [Space]
     [SerializeField] private TextMeshProUGUI playersInGameText;
+    [Space] 
+    [SerializeField] private SpawnerControl spawnerControl;
     public NetworkVariable<int> PlayersInGame { get; } = new NetworkVariable<int>();
 
+    private bool serverStarted;
     private int previousNumberOfPlayers;
     
     void Awake()
@@ -98,7 +102,7 @@ public class UIManager : NetworkBehaviour
         {
             if (NetworkManager.Singleton.StartHost())
             {
-                
+                serverStarted = true;
                 Debug.Log("Host started...");
             }
             else
@@ -111,7 +115,7 @@ public class UIManager : NetworkBehaviour
         {
             if (NetworkManager.Singleton.StartServer())
             {
-
+                
                 Debug.Log("Server started...");
             }
             else
@@ -132,5 +136,13 @@ public class UIManager : NetworkBehaviour
                 Debug.Log("Client could not enter!");
             }
         });
+        
+        startPhysicsButton.onClick.AddListener(() =>
+        {
+            if (!serverStarted) return;
+            
+            spawnerControl.SpawnObjectsServerRpc();
+        });
     }
+    
 }
