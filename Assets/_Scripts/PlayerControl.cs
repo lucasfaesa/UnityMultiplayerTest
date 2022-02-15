@@ -48,7 +48,6 @@ public class PlayerControl : NetworkBehaviour
             transform.Translate(Vector3.forward * Time.deltaTime * playerSpeed);
             //animator.SetFloat(Speed, 5);
             SetAnimatorSpeedValueServerRpc(5);
-            Debug.LogError(animator.GetFloat(Speed));
         }
 
 

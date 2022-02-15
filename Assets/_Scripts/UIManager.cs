@@ -14,6 +14,7 @@ public class UIManager : NetworkBehaviour
     [SerializeField] private Button startHostButton;
     [SerializeField] private Button startClientButton;
     [SerializeField] private Button startPhysicsButton;
+    [SerializeField] private TMP_InputField IpField;
     [Space]
     [SerializeField] private TextMeshProUGUI playersInGameText;
     [Space] 
@@ -70,7 +71,7 @@ public class UIManager : NetworkBehaviour
 
             if (PlayersInGame.Value != previousNumberOfPlayers)
             {
-                Debug.Log("Player Connected, ID: "  + NetworkManager.Singleton.ConnectedClientsList[NetworkManager.Singleton.ConnectedClientsList.Count - 1].ClientId);
+                Debug.LogError("Player Connected, ID: "  + NetworkManager.Singleton.ConnectedClientsList[NetworkManager.Singleton.ConnectedClientsList.Count - 1].ClientId);
                 previousNumberOfPlayers = PlayersInGame.Value;
                 UpdatePlayerCountServerRpc();
             }
@@ -93,13 +94,17 @@ public class UIManager : NetworkBehaviour
     {
         yield return new WaitForSeconds(2f);
         playersInGameText.text = "Players in game: " + PlayersInGame.Value;
-        Debug.LogError("Updated");
+
     }
 
     private void Start()
     {
-        startHostButton.onClick.AddListener(() =>
+        startHostButton.onClick.AddListener(async () =>
         {
+            if (RelayManager.instance.IsRelayEnabled)
+                await RelayManager.instance.SetupRelay();
+
+
             if (NetworkManager.Singleton.StartHost())
             {
                 serverStarted = true;
@@ -113,6 +118,7 @@ public class UIManager : NetworkBehaviour
         
         startServerButton.onClick.AddListener(() =>
         {
+            
             if (NetworkManager.Singleton.StartServer())
             {
                 
@@ -124,8 +130,11 @@ public class UIManager : NetworkBehaviour
             }
         });
         
-        startClientButton.onClick.AddListener(() =>
+        startClientButton.onClick.AddListener(async () =>
         {
+            if (RelayManager.instance.IsRelayEnabled && !string.IsNullOrEmpty(IpField.text))
+                await RelayManager.instance.JoinRelay(IpField.text);
+            
             if (NetworkManager.Singleton.StartClient())
             {
 
